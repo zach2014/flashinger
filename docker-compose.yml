@@ -4,3 +4,6 @@ services:
     uimgmt:
         build: ./
         image: flask-uimgmt
+        ports:
+            - 8089:8089
+        network_mode: "host"
