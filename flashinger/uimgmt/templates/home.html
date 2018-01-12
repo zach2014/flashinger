@@ -1,4 +1,41 @@
 {% extends "layout.html" %}
 {% block body %}
-    <p> Here to list the docker host</p>
+<div class="container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Hostname</th>
+          <th scope="col">Ip Address</th>
+          <th scope="col">Macvlan Interfaces</th>
+          <th scope="col">Labels</th>
+          <th scope="col">Operations</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for  machine in machines %}
+
+        <tr>
+          <td>{{machine.id}}</td>
+          <td>{{machine.hostname}}</td>
+          <td>{{machine.ip_addr}}</td>
+          <td>
+            {% for intf in machine.interfaces.all() %}
+              <a class="btn btn-link" href="{{url_for('show_interface', interface_id=intf.id)}}" role="button">{{intf.name }}</a>
+            {%endfor%}
+          </td>
+          <td>
+              {% for lbl in machine.labels %}
+              <span class="badge badge-info" title="{{lbl.desc}}">{{lbl.name}}</span>
+              {% endfor %}
+          </td>
+          <td>
+              <a class="btn btn-link btn-sm" href="{{url_for('show_machine', machine_id=machine.id)}}" role="button">Check</a>
+              <button type="button" class="btn btn-danger btn-sm">Delete</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
 {% endblock %}

@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+    <div class="row"> Detailed Information of {{intf.name}} </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Name</th>
+          <th scope="col">Machine</th>
+          <th scope="col">Network Subnet</th>
+          <th scope="col">Minimum Vlan ID</th>
+          <th scope="col">Maximum Vlan ID</th>
+          <th scope="col">Labels</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{intf.id}}</td>
+          <td>{{intf.name}}</td>
+          <td>
+              <a class="btn btn-link" href="{{url_for('show_machine', machine_id=intf.machine.id)}}" role="button">{{intf.machine.hostname }}</a>
+          </td>
+          <td>{{intf.subnet}}</td>
+          <td>{{intf.min_vlan}}</td>
+          <td>{{intf.max_vlan}}</td>
+          <td>
+              {% for lbl in intf.labels%}
+                <span class="badge badge-info" title="{{lbl.desc}}">{{lbl.name}}</span>
+              {%endfor%}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+{% endblock %}
