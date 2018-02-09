@@ -27,7 +27,7 @@ class Label(db.Model):
     """Schema of label for marking resource"""
     __tablename__ = 'label'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
+    name = db.Column(db.String(64), nullable=False, unique=True)
     desc = db.Column(db.String(256), nullable=False)
 
 
@@ -37,7 +37,7 @@ class DockerMachine(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     hostname = db.Column(db.String(64))
     ip_addr =  db.Column(db.String(15), nullable=False, unique=True)
-    interfaces = db.relationship('MacVlanInterface', backref='machine', lazy='dynamic')
+    interfaces = db.relationship('MacVlanInterface', backref='machine', cascade='all, delete-orphan', lazy='dynamic')
     labels = db.relationship('Label', secondary=machines_labels, lazy='subquery', 
             backref=db.backref('machines', lazy=True))
 

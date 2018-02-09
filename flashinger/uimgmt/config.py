@@ -14,8 +14,9 @@ Define Configurations for kinds of environment
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
 DEBUG = True
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'default.sqlite')
+SQLALCHEMY_DATABASE_URI = os.environ.get('DB_URL') or 'sqlite:///' + os.path.join(base_dir, 'default.sqlite')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+SECRET_KEY = os.environ.get('SECRET_KEY') or 'just a sceret key'
 
 class ProdConfig(object):
     DEBUG = False

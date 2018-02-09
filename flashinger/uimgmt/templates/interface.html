@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
-{% block body %}
+{% block main %}
 <div class="container">
-    <div class="row"> Detailed Information of {{intf.name}} </div>
+    <div class="row"> Detailed Information of Interfaces </div>
     <table class="table">
       <thead>
         <tr>
@@ -12,9 +12,11 @@
           <th scope="col">Minimum Vlan ID</th>
           <th scope="col">Maximum Vlan ID</th>
           <th scope="col">Labels</th>
+          <th scope="col">Services</th>
         </tr>
       </thead>
       <tbody>
+        {% for intf in intfs %}
         <tr>
           <td>{{intf.id}}</td>
           <td>{{intf.name}}</td>
@@ -29,8 +31,52 @@
                 <span class="badge badge-info" title="{{lbl.desc}}">{{lbl.name}}</span>
               {%endfor%}
           </td>
+          <td>
+            <button class="btn btn-link btn-sm" id="add_service" data-toggle="modal" data-target="#service_add" data-id="{{intf.id}}" role="button">Add</button>
+          </td>
         </tr>
+        {% endfor %}
       </tbody>
     </table>
 </div>
+<div class="modal fade" id="service_add" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_service_label">Add New Service</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{url_for('add_service', next=request.path)}}" method="post">
+            {{ s_form.csrf }}
+            {{ s_form.hidden_tag() }}
+          <div class="form-group">
+                <input type="text" class="form-control" id="c_name" name="c_name" placeholder="container given name">
+                <input type="text" class="form-control" id="vlan_id" name="vlan_id" placeholder="vlan id">
+                <input type="text" class="form-control" id="fw_oid" name="fw_oid" placeholder="Firmware OID">
+                <input type="text" class="form-control" id="intf_id" name="intf_id" value="" hidden>
+                <button type="submit" class="btn btn-success">Add New Service </button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footer %}
+<script>
+$(document).on("click", "#add_service", function () {
+     var intf_id = $(this).data('id');
+     $(".modal-body #intf_id").val( intf_id );
+     // As pointed out in comments, 
+     // it is superfluous to have to manually call the modal.
+     // $('#interface_add').modal('show');
+});
+</script>
+
 {% endblock %}

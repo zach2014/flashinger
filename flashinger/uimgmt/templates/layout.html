@@ -4,12 +4,37 @@
         <meta charset="utf-8">
         <title>Flashinger Cluster</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js"></script>
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
-    {% block body %}
+     <header class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <ul class="navbar-nav flex-row">
+                <li class="nav-item"><a href="/">Home</a></li>
+                <li class="nav-item"><a href="/machine">Machine</a></li>
+                <li class="nav-item"><a href="/interface">Interface</a></li>
+            </ul>
+        </div>
+     </header>
+    <div class="container-fluid">
+        <div class="row flex-xl-nowrap">
+        {% block left %}
+        
+        {% endblock %}
 
+        {% block main %}
+
+        {% endblock %}
+
+        {% block right %}
+        
+        {% endblock %}
+        </div>
+    </div>
+    {% block footer %}
     {% endblock %}
     </body>
 </html>

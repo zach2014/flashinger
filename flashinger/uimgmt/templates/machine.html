@@ -1,73 +1,159 @@
 {% extends "layout.html" %}
-{% block body %}
-<div class="container">
-    <div class="row"> Basic Information </div>
-    {% if version %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Iterm</th>
-          <th scope="col">Value</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for  k in version %}
-        <tr>
-          <td>{{k}}</td>
-          <td>{{version.get(k)}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {%endif %}
-    <div class="row"> Containers </div>
-    {% if containers %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Id</th>
-          <th scope="col">Name</th>
-          <th scope="col">Image</th>
-          <th scope="col">Status</th>
-          <th scope="col">Labels</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for c in containers %}
-        <tr>
-          <td>{{c.short_id}}</td>
-          <td>{{c.name}}</td>
-          <td>{{c.image}}</td>
-          <td>{{c.status}}</td>
-          <td>{{c.labels}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% endif %}
 
-    <div class="row"> Networks </div>
-    {% if networks %}
+{% block left %}
+<div class="col-md-1">
+</div>
+{% endblock %}
+{% block main %}
+<div class="col-md-8">
     <table class="table">
       <thead>
         <tr>
           <th scope="col">Id</th>
-          <th scope="col">Name</th>
-          <th scope="col">Driver</th>
+          <th scope="col">Hostname</th>
+          <th scope="col">Ip Address</th>
+          <th scope="col">Macvlan Interfaces</th>
+          <th scope="col">Labels</th>
+          <th scope="col">Operations</th>
         </tr>
       </thead>
       <tbody>
-      {% for n in networks %}
+        {% for  machine in machines %}
+
         <tr>
-          <td>{{n.short_id}}</td>
-          <td>{{n.name}}</td>
-          <td>{{n.attrs.get('Driver')}}</td>
+          <td>{{machine.id}}</td>
+          <td>{{machine.hostname}}</td>
+          <td>{{machine.ip_addr}}</td>
+          <td>
+            {% for intf in machine.interfaces.all() %}
+            <button class="btn btn-link btn-sm" id="expand_interface" data-toggle="modal" data-target="#interface_expand" data-id="{{intf.id}}" role="button">{{intf.name}}</button>
+            {%endfor%}
+          </td>
+          <td>
+              {% for lbl in machine.labels %}
+              <span class="badge badge-info" title="{{lbl.desc}}">{{lbl.name}}</span>
+              {% endfor %}
+          </td>
+          <td>
+              <div class="btn-group">
+                  <a class="btn btn-link btn-sm" href="{{url_for('show_dockerd', machine_id=machine.id)}}" role="button">Check</a>
+                  <button class="btn btn-link btn-sm" id="add_interface" data-toggle="modal" data-target="#interface_add" data-id="{{machine.id}}" role="button">Add Interface</button>
+                  <a class="btn btn-link btn-sm" href="{{url_for('del_machine', machine_id=machine.id)}}" role="button">Delete</a>
+              </div>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-    {% else %}
-       <p>No network </p>
-    {% endif %}
 </div>
+<!-- Modal of expand interface BEGIN-->
+<div class="modal fade" id="interface_expand" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="expand_intf_label">Interface Info</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <p>show detailed interface information </p>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal of expand interface END-->
+<!-- Modal of add new interface BEGIN-->
+<div class="modal fade" id="interface_add" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="add_intf_label">Add New Interface</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{url_for('add_interface')}}", method="post">
+        {{ m_form.csrf }}
+        {{ m_form.hidden_tag() }}
+            <div class="form-group">
+              <label for="name">Interface Name</label>
+              <input type="text" class="form-control" id="name" name="name" aria-describedby="emailHelp" placeholder="Interface Name">
+              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+
+            <input type="text" class="form-control" id="machine_id" name="machine_id" value="" hidden>
+
+            <div class="form-group">
+              <label for="subnet">Subnet</label>
+              <input type="text" class="form-control" id="subnet" name="subnet" aria-describedby="emailHelp" placeholder="Subnet">
+              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+              <label for="min_vlan">Min Vlan</label>
+              <input type="text" class="form-control" id="min_vlan" name="min_vlan" aria-describedby="emailHelp" placeholder="Minimum Vlan Id">
+              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+              <label for="max_vlan">Max Vlan</label>
+              <input type="text" class="form-control" id="max_vlan" name="max_vlan" aria-describedby="emailHelp" placeholder="Maximum Vlan Id">
+              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="col">
+              <button type="submit" class="btn btn-success">Add New Interface </button>
+            </div>
+        </form> 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal of add new interface END-->
+{% endblock %}
+{% block right %}
+<div class="col-md-3">
+    <form action="{{url_for('add_machine')}}" method="post">
+        {{ m_form.csrf }}
+        {{ m_form.hidden_tag() }}
+      <div class="form-group">
+            <input type="text" class="form-control" id="hostname" name="hostname" placeholder="host name">
+            <input type="text" class="form-control" id="ip_addr" name="ip_addr" placeholder="ip address">
+            <button type="submit" class="btn btn-success">Add New Machine </button>
+      </div>
+    </form>
+    <div class="row">
+        {% with msgs = get_flashed_messages(with_categories=True) %}
+        {% if msgs %}
+            {% for m in msgs %}
+                {% if "Error" not in m[1]: %}
+                <div class="alert alert-success">{{m[1]}}</div>
+                {% endif %}
+                {% if "Error" in m[1]: %}
+                <div class="alert alert-warning">{{m[1]}}</div>
+                {% endif %}
+            {% endfor %}
+
+        {% endif %}
+        {%endwith%}
+    </div>
+</div>
+{% endblock %}
+{% block footer %}
+<script>
+$(document).on("click", "#add_interface", function () {
+     var machine_id = $(this).data('id');
+     $(".modal-body #machine_id").val( machine_id );
+     // As pointed out in comments, 
+     // it is superfluous to have to manually call the modal.
+     // $('#interface_add').modal('show');
+});
+</script>
+
 {% endblock %}

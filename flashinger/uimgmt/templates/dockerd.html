@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block main %}
+<div class="container">
+    <div class="row"> Basic Information </div>
+    {% if version %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Iterm</th>
+          <th scope="col">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for  k in version %}
+        <tr>
+          <td>{{k}}</td>
+          <td>{{version.get(k)}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {%endif %}
+    <div class="row"> Containers </div>
+    {% if containers %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Name</th>
+          <th scope="col">Image</th>
+          <th scope="col">Status</th>
+          <th scope="col">Labels</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for c in containers %}
+        <tr>
+          <td>{{c.short_id}}</td>
+          <td>{{c.name}}</td>
+          <td>{{c.image}}</td>
+          <td>{{c.status}}</td>
+          <td>{{c.labels}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    <div class="row"> Networks </div>
+    {% if networks %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Name</th>
+          <th scope="col">Driver</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for n in networks %}
+        <tr>
+          <td>{{n.short_id}}</td>
+          <td>{{n.name}}</td>
+          <td>{{n.attrs.get('Driver')}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+       <p>No network </p>
+    {% endif %}
+</div>
+{% endblock %}
